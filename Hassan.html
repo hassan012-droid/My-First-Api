@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div onclick="postRequest()">
+        click me
+    </div>
+    <script>
+        function postRequest(){
+            const obj1={
+                "username": "maniff",
+                "password": "mannnnn"
+            }
+            const url="http://localhost:3001/api/Hassan/"
+            fetch(url, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(obj1)
+            }).then((response)=>response.json)
+            .then((data)=>console.log(data))
+            .catch(error=>console.log(error))
+        }
+    </script>
+    
+</body>
+</html>
