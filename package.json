@@ -9,10 +9,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "server": "node --watch index.js"
+    "server": "node --watch index.js",
+    "serverTwo": "node --watch index.js mayor091695"
   },
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.3.0"
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "mongoose": "^9.12.1"
   }
 }

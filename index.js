@@ -1,6 +1,9 @@
+require("dotenv").config()
 const express= require("express")
 const app= express()
 const cors=require("cors")
+const firstTable = require("./module/firstTable")
+
 const requestLogger=(request, response, next)=>{
     console.log(`Method:`, request.method)
     console.log(`Path:`, request.path)
@@ -39,7 +42,13 @@ app.get("/", function(request,response){
 })
 
 app.get("/api/Hassan", function(request,response){
-    return response.send(db)
+    const getAllDoc=firstTable.find({}).then(function(result){
+         return response.send({"allDoc":result})
+    })
+    .catch(function(error){
+        console.log(error)
+    })
+   
 })
 
 app.get("/api/Hassan/:count", function(request,response){
