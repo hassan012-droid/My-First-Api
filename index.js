@@ -43,7 +43,7 @@ app.get("/", function(request,response){
 
 app.get("/api/Hassan", function(request,response){
     const getAllDoc=firstTable.find({}).then(function(result){
-         return response.send({"allDoc":result})
+         return response.send(result)
     })
     .catch(function(error){
         console.log(error)
@@ -69,17 +69,20 @@ app.delete("/api/Hassan/delete/:count",(request,response)=>{
 app.post("/api/Hassan",(request,response)=>{
     const clientRequest=request.body
     const getId=db.length+1
-    const getImportance=Math.random<0.5
+    const getImportance=Math.random()<0.5
     const newObj={
-        id: getId,
-        importance: getImportance,
-        name:clientRequest.name
+        ...clientRequest,
     }
 
     const newdb=db.concat(newObj)
     console.log(clientRequest)
-    return response.status(200).send(newObj)
-    
+    firstTable.insertOne(newObj).then(function(result){
+         return response.status(200).send(result)
+    })
+    .catch(function(error){
+        console.log(error)
+        return response.status(500).send({"error": "failed to create a document"})
+    })
 
     // return response.status(201).send({"clientResponse":clientRequest})
 })
