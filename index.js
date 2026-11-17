@@ -51,11 +51,22 @@ app.get("/api/Hassan", function(request,response){
    
 })
 
-app.get("/api/Hassan/:count", function(request,response){
-    const getId= request.params.count
-    const getElement=db.filter((elements,idx)=>idx===Number(getId))
-    return response.send(getElement)
+app.get("/api/Hassan/:count", function(request,response,next){
+    // const getId= request.params.count
+    // const getElement=db.filter((elements,idx)=>idx===Number(getId))
+    // return response.send(getElement)
+    firstTable.findById(request.params.count)
+    .then(result=>{
+        if(result){
+            return response.status(200).send(result)
+        }
+        else{
+            return response.status(404).send({error: "Document not found"})
+        }
+    }).catch(error=>next(error))
 })
+
+
 
 app.delete("/api/Hassan/delete/:count",(request,response)=>{
     const getId=Number(request.params.count)
@@ -66,7 +77,7 @@ app.delete("/api/Hassan/delete/:count",(request,response)=>{
     })
 })
 
-app.post("/api/Hassan",(request,response)=>{
+app.post("/api/Hassan",(request,response,next)=>{
     const clientRequest=request.body
     const getId=db.length+1
     const getImportance=Math.random()<0.5
@@ -79,13 +90,45 @@ app.post("/api/Hassan",(request,response)=>{
     firstTable.insertOne(newObj).then(function(result){
          return response.status(200).send(result)
     })
-    .catch(function(error){
-        console.log(error)
-        return response.status(500).send({"error": "failed to create a document"})
-    })
+    .catch((error)=>next(error))
 
     // return response.status(201).send({"clientResponse":clientRequest})
 })
+
+app.put("/api/Hassan/:count", async(req,res,next)=>{
+    const id=req.params.count
+    const getDoc=await firstTable.findById(id)
+    if(!getDoc){
+        return res.status(404).send({error: "documents not found"})
+    }
+    console.log(!getDoc.importance, getDoc.importance)
+    firstTable.updateOne(
+        {_id: {$eq: id}},
+        {$set: {
+            importance: !getDoc.importance
+        }}
+    ).then(async result=>{
+        const mainResult=await firstTable.findById(id)
+        return res.status(201).send(mainResult)
+    })
+    .catch(error=>next(error))
+})
+
+const unknownEndpoint=(request, response)=>{
+    return response.status(404).send({error: "unknown endpoint"})
+}
+const errorHandler=(error, request, response, next)=>{
+    console.log(error.message)
+    if(error.name==="CastError"){
+        return response.status(400).send({error: "malformatted id"})
+    }
+    else if(error.name==="ValidationError"){
+        return response.status(400).json({error: error.message})
+    }
+    next(error)
+}
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT=process.env.PORT || 3001
 app.listen(PORT, function(){
